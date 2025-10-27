@@ -1,50 +1,126 @@
-# Welcome to your Expo app 👋
+# Bubbly 💬
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A modern React Native chat application built with Expo Router and styled with NativeWind and ReactNative-ReAnimated.
 
-## Get started
+## ✨ Features
 
-1. Install dependencies
+- **Modern UI**: Clean design with pattern backgrounds and smooth animations
+- **Dark/Light Theme**: Automatic adaptation to system theme
+- **Cross-Platform**: iOS, Android, and Web support
+- **Type-Safe Routing**: Built with Expo Router and TypeScript
+- **Responsive Design**: Optimized for all screen sizes
 
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or later)
+- pnpm package manager
+- Expo CLI
+- iOS Simulator (for iOS development)
+- Android Studio/Emulator (for Android development)
+
+### Installation
+
+1. Clone the repository:
    ```bash
-   npm install
+   git clone https://github.com/Saket6198/bubbly.git
+   cd bubbly
    ```
 
-2. Start the app
-
+2. Install dependencies:
    ```bash
-   npx expo start
+   pnpm install
    ```
 
-In the output, you'll find options to open the app in a
+3. Start the development server:
+   ```bash
+   pnpm start
+   ```
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### Running on Different Platforms
 
 ```bash
-npm run reset-project
+# iOS
+pnpm ios
+
+# Android
+pnpm android
+
+# Web
+pnpm web
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🛠️ Tech Stack
 
-## Learn more
+- **Framework**: React Native with Expo
+- **Routing**: Expo Router (file-based routing)
+- **Styling**: NativeWind (Tailwind CSS for React Native)
+- **Language**: TypeScript
+- **Icons**: Phosphor React Native
+- **State Management**: React Context (planned)
+- **Backend**: (to be integrated)
 
-To learn more about developing your project with Expo, look at the following resources:
+## 📁 Project Structure
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```
+app/
+├── (auth)/               # Authentication screens
+│   ├── welcome.tsx       # Welcome/landing page
+│   ├── register.tsx      # User registration
+│   └── _layout.tsx       # Auth layout
+├── _layout.tsx           # Root layout
+└── index.tsx             # Main entry point
 
-## Join the community
+components/
+├── ScreenWrapper.tsx     # Reusable screen container
+└── Typo.tsx             # Typography component
 
-Join our community of developers creating universal apps.
+constants/
+└── theme.ts             # App theme and colors
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+types/
+└── types.ts             # TypeScript type definitions
+```
+
+## 🎨 Design System
+
+The app uses a consistent design system with:
+
+- **Primary Color**: `#facc15` (Yellow)
+- **Dark Background**: `#1c1917` (Neutral 900)
+- **Light Background**: `#ffffff` (White)
+- **Typography**: Custom Typo component with consistent sizing
+- **Icons**: Phosphor icon library
+- **Patterns**: Background patterns for visual appeal
+
+## 📱 Screenshots
+
+*(Screenshots will be added as the app develops)*
+
+## 🚧 Development Status
+
+This project is currently in development. Planned features include:
+
+- [ ] User authentication
+- [ ] Real-time messaging
+- [ ] Group chats
+- [ ] Media sharing
+- [ ] Push notifications
+- [ ] Backend integration
+
+## 🤝 Contributing
+
+This is a personal project by Saket. Feel free to fork and create your own version!
+
+## 📄 License
+
+This project is private and proprietary.
+
+## 👨‍💻 Developer
+
+**Made by Saket**
+
+---
+
+*Stay Connected. Private by design. Secure by default.*
