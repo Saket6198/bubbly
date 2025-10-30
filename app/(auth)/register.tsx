@@ -7,8 +7,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
+  
 } from "react-native";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -40,7 +42,7 @@ const RegisterPage = () => {
             style={{ backgroundColor: "#ffffff" }}
             className="flex flex-1 mt-10 rounded-t-[60px] p-5"
           >
-            <View className="flex flex-col mt-10 mx-5">
+            <View className="flex flex-col mt-5 mx-5">
               <Text
                 style={{ fontSize: widthPercentageToDP(7) }}
                 className="font-semibold"
@@ -48,6 +50,10 @@ const RegisterPage = () => {
                 Getting Started 
               </Text>
               <Text >Create an account to continue</Text>
+            </View>
+            <View className="flex flex-col mt-10 mx-5">
+              <TextInput className="bg-gray-100 rounded-[20px] px-4 py-4" placeholder="Enter your name"/>
+              <Text>Hello</Text>
             </View>
           </View>
         </ScreenWrapper>
