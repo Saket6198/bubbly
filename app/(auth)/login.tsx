@@ -1,4 +1,5 @@
 import ScreenWrapper from "@/components/ScreenWrapper";
+import { useAuth } from "@/contexts/authContexts";
 import { loginSchema, LoginSchemaProps } from "@/schema/authSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
@@ -6,6 +7,8 @@ import { CaretLeftIcon, Envelope, Lock } from "phosphor-react-native";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Text,
@@ -15,10 +18,13 @@ import {
 } from "react-native";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import { colors } from "../../constants/theme";
 
-const login = () => {
+const Login = () => {
+  const [loading, setLoading] = React.useState(false);
   const router = useRouter();
+  const { signIn } = useAuth();
 
   const {
     control,
@@ -28,8 +34,21 @@ const login = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginSchemaProps) => {
-    console.log("Login Data:", data);
+  const onSubmit = async (data: LoginSchemaProps) => {
+    try {
+      setLoading(true);
+      await signIn(data.email, data.password);
+      setLoading(false);
+      console.log("Login successful");
+      Toast.show({
+        type: "success",
+        text1: "Login successful!",
+      });
+    } catch (error) {
+      setLoading(false);
+      console.error("Login failed:", error);
+     Alert.alert("Invalid email or password");
+    }
   };
 
   return (
@@ -131,18 +150,26 @@ const login = () => {
 
               <TouchableOpacity
                 onPress={handleSubmit(onSubmit)}
-                className="bg-yellow-400 rounded-[20px] py-4 mt-4"
+                disabled={loading}
+                className={`rounded-[20px] py-4 mt-4 flex-row justify-center items-center ${loading ? "bg-yellow-300" : "bg-yellow-400"}`}
               >
+                {loading && (
+                  <ActivityIndicator
+                    size="small"
+                    color="#000000"
+                    style={{ marginRight: 8 }}
+                  />
+                )}
                 <Text className="text-center text-black font-semibold text-lg">
-                  Login
+                  {loading ? "Logging in..." : "Login"}
                 </Text>
               </TouchableOpacity>
             </View>
             <View className="mt-5 flex flex-row items-center justify-center">
-                <Text>Don't have an account? </Text>
-                <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
-                  <Text className="text-yellow-400 font-bold">Sign Up</Text>
-                </TouchableOpacity>
+              <Text>Don't have an account? </Text>
+              <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
+                <Text className="text-yellow-400 font-bold">Sign Up</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </ScreenWrapper>
@@ -151,4 +178,4 @@ const login = () => {
   );
 };
 
-export default login;
+export default Login;

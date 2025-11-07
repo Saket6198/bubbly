@@ -1,3 +1,4 @@
+import { useAuth } from "@/contexts/authContexts";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { View } from "react-native";
@@ -5,13 +6,22 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-const index = () => {
+const Index = () => {
   const router = useRouter();
+  const { token, isLoading } = useAuth();
+  // console.log("Auth Token:", token);
   useEffect(() => {
     setTimeout(() => {
-        router.replace("/(auth)/welcome")
-    }, 1000);
-  }, []);
+      if (!isLoading) {
+        if (token) {
+          router.replace("/(main)/home");
+        } else {
+          router.replace("/(auth)/welcome");
+        }
+      }
+    }, 500);
+    }, [isLoading, token]);
+
   return (
     <SafeAreaProvider className="flex">
       <View className="flex flex-1 justify-center items-center bg-neutral-900">
@@ -25,4 +35,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
