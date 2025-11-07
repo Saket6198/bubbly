@@ -1,6 +1,5 @@
 import { baseUrl } from "@/constants";
 import axios from "axios";
-import Toast from "react-native-toast-message";
 export const login = async (
   email: string,
   password: string
@@ -12,13 +11,8 @@ export const login = async (
     });
     return response.data;
   } catch (err: any) {
-    Toast.show({
-      type: "error",
-      text1: "Login failed",
-      text2: "Invalid email or password",
-    });
     console.log("Login error:", err);
-    throw new Error(err);
+    return Promise.reject(err);
   }
 };
 

@@ -40,8 +40,7 @@ export interface InputProps extends TextInputProps {
   //   error?: string;
 }
 
-export interface DecodedTokenProps {
-  user: UserProps;
+export interface DecodedTokenProps extends UserProps {
   exp: number;
   iat: number;
 }
