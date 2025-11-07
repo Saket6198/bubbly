@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setToken(token);
       await SecureStore.setItemAsync("token", token);
       const decode = jwtDecode<DecodedTokenProps>(token);
-      setUser(decode.user);
+      setUser(decode);
     }
   };
 
@@ -36,9 +36,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsLoading(true);
         const savedToken = await SecureStore.getItemAsync("token");
         if (savedToken) {
+          if (
+            jwtDecode<DecodedTokenProps>(savedToken).exp * 1000 <
+            Date.now()
+          ) {
+            await SecureStore.deleteItemAsync("token");
+            setIsLoading(false);
+            router.replace("/(auth)/welcome");
+            return;
+          }
           setToken(savedToken);
           const decode = jwtDecode<DecodedTokenProps>(savedToken);
-          setUser(decode.user);
+          setUser(decode);
         }
       } catch (error) {
         console.error("Error loading token:", error);
@@ -70,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setToken(null);
     setUser(null);
     await SecureStore.deleteItemAsync("token");
-    router.replace("/(auth)/login");
+    router.replace("/(auth)/welcome");
   };
 
   return (

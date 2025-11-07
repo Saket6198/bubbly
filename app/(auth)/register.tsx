@@ -1,5 +1,6 @@
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { colors } from "@/constants/theme";
+import { useAuth } from "@/contexts/authContexts";
 import { registerSchema, RegisterSchemaProps } from "@/schema/authSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
@@ -7,6 +8,7 @@ import { CaretLeftIcon, Envelope, Lock, User } from "phosphor-react-native";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Text,
@@ -16,6 +18,7 @@ import {
 } from "react-native";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Toast } from "toastify-react-native";
 const RegisterPage = () => {
   const {
     control,
@@ -25,9 +28,23 @@ const RegisterPage = () => {
     resolver: zodResolver(registerSchema),
   });
   const router = useRouter();
+  const { signUp } = useAuth();
+  const [loading, setLoading] = React.useState(false);
 
-  const onSubmit = (data: RegisterSchemaProps) => {
-    console.log("Form Data:", data);
+  const onSubmit = async (data: RegisterSchemaProps) => {
+    try {
+      setLoading(true);
+      await signUp(data.email, data.password, data.userName);
+      Toast.success("Registration successful!");
+      setLoading(false);
+    } catch (err: any) {
+      console.log("Error during sign up:", err);
+      // if(err.status === 400){
+      //   Toast.error("User already exists. Please login.");
+      // }
+      Toast.error("Registration failed. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -192,11 +209,19 @@ const RegisterPage = () => {
               </View>
 
               <TouchableOpacity
-                className="bg-yellow-400 rounded-[20px] py-4 mt-6"
+                className={`rounded-[20px] py-4 mt-6 flex-row justify-center items-center ${loading ? "bg-yellow-300" : "bg-yellow-400"}`}
                 onPress={handleSubmit(onSubmit)}
+                disabled={loading}
               >
+                {loading && (
+                  <ActivityIndicator
+                    size="small"
+                    color="#000000"
+                    style={{ marginRight: 8 }}
+                  />
+                )}
                 <Text className="text-center text-black font-semibold text-lg">
-                  Create Account
+                  {loading ? "Creating Account..." : "Create Account"}
                 </Text>
               </TouchableOpacity>
               <View className="flex flex-row justify-center items-center text-center">

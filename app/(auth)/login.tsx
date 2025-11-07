@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
+import { Toast } from "toastify-react-native";
 import { colors } from "../../constants/theme";
 
 const Login = () => {
@@ -40,14 +40,11 @@ const Login = () => {
       await signIn(data.email, data.password);
       setLoading(false);
       console.log("Login successful");
-      Toast.show({
-        type: "success",
-        text1: "Login successful!",
-      });
+      Toast.success("Login successful!");
     } catch (error) {
       setLoading(false);
       console.error("Login failed:", error);
-     Alert.alert("Invalid email or password");
+      Toast.error("Invalid email or password");
     }
   };
 
