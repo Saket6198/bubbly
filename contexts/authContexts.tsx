@@ -1,4 +1,5 @@
 import { login, register } from "@/services/authService";
+import { connectSocket, disconnectSocket } from "@/sockets/socket";
 import { AuthContextProps, DecodedTokenProps, UserProps } from "@/types/types";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -46,6 +47,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             return;
           }
           setToken(savedToken);
+          await connectSocket();
           const decode = jwtDecode<DecodedTokenProps>(savedToken);
           setUser(decode);
         }
@@ -61,6 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     const response = await login(email, password);
     await updateToken(response.token);
+    await connectSocket();
     router.replace("/(main)/home");
   };
 
@@ -72,6 +75,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   ) => {
     const response = await register(email, password, name, avatar);
     await updateToken(response.token);
+    await connectSocket();
     router.replace("/(main)/home");
   };
 
@@ -79,6 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setToken(null);
     setUser(null);
     await SecureStore.deleteItemAsync("token");
+    await disconnectSocket();
     router.replace("/(auth)/welcome");
   };
 
