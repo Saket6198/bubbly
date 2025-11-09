@@ -43,7 +43,7 @@ export default function RootLayout() {
             animationStyle="fade"
             showProgressBar={false}
             showCloseIcon={false}
-            topOffset="20"
+            // topOffset="20"
             useModal={false}
           />
           <StatusBar style="auto" />
