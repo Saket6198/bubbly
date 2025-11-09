@@ -57,6 +57,7 @@ const RegisterPage = () => {
           style={{ flex: 1 }}
           showPattern={true}
           preventPatternOverlay={true}
+          bgOpacity={0.5}
         >
           <View className="flex flex-row justify-between items-center w-full px-3 pt-3">
             <TouchableOpacity onPress={() => router.back()} className="p-1">
