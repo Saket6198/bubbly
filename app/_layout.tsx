@@ -39,10 +39,10 @@ export default function RootLayout() {
           <ToastManager
             position="top"
             theme="dark"
-            duration={3000}
+            duration={2000}
             animationStyle="fade"
             showProgressBar={false}
-            showCloseIcon={false}
+            showCloseIcon={true}
             // topOffset="20"
             useModal={false}
           />

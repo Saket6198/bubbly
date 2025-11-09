@@ -2,8 +2,10 @@ import Avatar from "@/components/Avatar";
 import { colors } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContexts";
 import { userProfileSchema } from "@/schema/userProfileSchema";
+import { uploadToCloudinary } from "@/services/imageService";
 import { updateProfile } from "@/sockets/socketEvents";
 import { zodResolver } from "@hookform/resolvers/zod";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import {
   EnvelopeIcon,
@@ -11,17 +13,28 @@ import {
   SignOutIcon,
   User,
 } from "phosphor-react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Modal from "react-native-modal";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { Toast } from "toastify-react-native";
+
 const Settings = () => {
   const router = useRouter();
+  const [image, setImage] = useState<string | null>(null);
+
   const [isVisible, setIsVisible] = React.useState(true);
   const { user, signOut, updateToken } = useAuth();
-  const [loading, setLoading] = React.useState(false);
+  const [updateloading, setUpdateLoading] = React.useState(false);
+  const [signOutLoading, setSignOutLoading] = React.useState(false);
   const handleClose = () => {
     setIsVisible(false);
     router.back();
@@ -32,13 +45,22 @@ const Settings = () => {
   const {
     control,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
-  } = useForm<{ name: string; avatar?: string | null}>({
+  } = useForm<{ name: string; avatar?: string }>({
     resolver: zodResolver(userProfileSchema),
     defaultValues: {
       name: user?.name ?? "",
+      avatar: "",
     },
   });
+  const watchedName = watch("name");
+  const watchedAvatar = watch("avatar");
+  const isNameChanged =
+    (watchedName ?? "").trim() !== (user?.name ?? "").trim();
+  const isAvatarChanged = watchedAvatar && watchedAvatar.trim() !== "";
+  const hasChanges = isNameChanged || isAvatarChanged;
   useEffect(() => {
     updateProfile(processUpdatedProfile);
 
@@ -47,9 +69,27 @@ const Settings = () => {
     };
   }, []);
 
+  const onPickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.5,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      const uri = result?.assets[0]?.uri;
+      setImage(uri);
+      setValue("avatar", uri);
+    }
+  };
+
   const processUpdatedProfile = (res: any) => {
     console.log("Profile updated:", res);
-    setLoading(false);
+    setUpdateLoading(false);
     if (res.success) {
       updateToken(res.data.token);
       router.back();
@@ -70,23 +110,57 @@ const Settings = () => {
         style: "destructive",
         onPress: async () => {
           try {
+            setSignOutLoading(true);
             await signOut();
+            setSignOutLoading(false);
           } catch (error) {
+            setSignOutLoading(false);
             console.error("Sign out failed:", error);
           }
         },
       },
     ]);
   };
-  const onSubmit = (data: { name: string }) => {
+  const onSubmit = async (data: { name: string; avatar?: string }) => {
+    setUpdateLoading(true);
     console.log("Submitting data:", data);
     if (!data.name.trim()) {
       Alert.alert("Please enter your name");
+      setUpdateLoading(false);
       return;
     }
-    updateProfile(data);
-    setLoading(true);
-    // good
+
+    const updatePayload: { name: string; avatar?: string } = {
+      name: data.name,
+    };
+
+    if (data.avatar && data.avatar.trim()) {
+      try {
+        const res = await uploadToCloudinary(data.avatar, "profiles");
+        if (res.success && res.data) {
+          console.log("cloudinary response:", res);
+          updatePayload.avatar = res.data;
+        } else {
+          console.log("Image upload failed:", res.msg);
+          Alert.alert(
+            "Image Upload Failed",
+            "Failed to upload avatar image. Please try again."
+          );
+          setUpdateLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.log("Image upload error:", error);
+        Alert.alert(
+          "Image Upload Failed",
+          "Failed to upload avatar image. Please try again."
+        );
+        setUpdateLoading(false);
+        return;
+      }
+    }
+
+    updateProfile(updatePayload);
   };
 
   return (
@@ -108,9 +182,9 @@ const Settings = () => {
               Update Profile
             </Text>
             <View className="mt-10">
-              <Avatar uri={user?.avatar ?? ""} isGroup={false} />
+              <Avatar uri={image || user?.avatar || ""} isGroup={false} />
               <View className="flex absolute right-1 bottom-2 bg-white p-2 rounded-full border">
-                <TouchableOpacity>
+                <TouchableOpacity onPress={onPickImage}>
                   <PencilIcon
                     size={widthPercentageToDP("5%")}
                     color={colors.neutral500}
@@ -154,7 +228,9 @@ const Settings = () => {
                 color={colors.neutral500}
                 style={{ marginRight: 12 }}
               />
-              <Text className="flex-1 text-neutral-500 py-4">{user?.email}</Text>
+              <Text className="flex-1 text-neutral-500 py-4">
+                {user?.email}
+              </Text>
             </View>
           </View>
         </View>
@@ -164,18 +240,44 @@ const Settings = () => {
             <TouchableOpacity
               className="flex-row items-center justify-center bg-red-50 border-2 border-red-200 rounded-2xl flex-1 py-4"
               onPress={handleSignOut}
+              disabled={signOutLoading}
             >
-              <SignOutIcon size={20} color="#ef4444" weight="bold" />
+              {signOutLoading ? (
+                <ActivityIndicator size="small" color="#ef4444" />
+              ) : (
+                <SignOutIcon size={20} color="#ef4444" weight="bold" />
+              )}
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="flex-row items-center justify-center bg-yellow-500 rounded-2xl flex-[2] py-4"
-              disabled={loading}
-              onPress={handleSubmit(onSubmit)}
+              className={
+                `flex-row items-center justify-center rounded-2xl flex-[2] py-4 ` +
+                (hasChanges && !updateloading
+                  ? "bg-yellow-500"
+                  : "bg-yellow-200")
+              }
+              disabled={!hasChanges || updateloading}
+              onPress={() => {
+                setUpdateLoading(true);
+                handleSubmit(onSubmit)();
+              }}
             >
-              <Text className="text-white font-bold text-base">
-                Save Changes
-              </Text>
+              {updateloading ? (
+                <>
+                  <ActivityIndicator size="small" color="white" />
+                  <Text className="text-white font-bold text-base ml-2">
+                    Saving...
+                  </Text>
+                </>
+              ) : hasChanges ? (
+                <Text className="text-white font-bold text-base">
+                  Save Changes
+                </Text>
+              ) : (
+                <Text className="text-neutral-400 font-bold text-base">
+                  Save Changes
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
