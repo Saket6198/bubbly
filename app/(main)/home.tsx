@@ -210,7 +210,7 @@ const Home = () => {
             });
           }}
         >
-          <PlusIcon size={32} weight={"bold"} color={colors.black} />
+          <PlusIcon size={32} color={colors.black} />
         </TouchableOpacity>
       </ScreenWrapper>
     </SafeAreaProvider>
