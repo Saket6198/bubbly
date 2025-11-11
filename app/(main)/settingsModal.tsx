@@ -11,7 +11,7 @@ import {
   EnvelopeIcon,
   PencilIcon,
   SignOutIcon,
-  User,
+  UserIcon,
 } from "phosphor-react-native";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -70,7 +70,6 @@ const Settings = () => {
   }, []);
 
   const onPickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
@@ -196,7 +195,7 @@ const Settings = () => {
           <View className="mt-10 px-10">
             <Text className="text-lg font-semibold mb-2">Name</Text>
             <View className="flex-row items-center bg-gray-100 rounded-[20px] px-4 py-4 mb-4">
-              <User
+              <UserIcon
                 size={20}
                 color={colors.neutral500}
                 style={{ marginRight: 12 }}
